@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
+const AppError = require('./AppError');
 
 /** Set Middleware */
 app.use(morgan('tiny'));
@@ -10,7 +11,9 @@ const verifyPassword = (req, res, next) => {
     if (password === 'xxx') {
         next();
     }
-    res.send("SORRY, NEED A PASSWORD BRO!");
+    /*  res.send("SORRY, NEED A PASSWORD BRO!"); */
+
+    throw new AppError('password required', 401);
 }
 
 /** End Middleware */
@@ -20,7 +23,9 @@ app.get('/', (req, res) => {
 })
 
 app.get('/dogs', (req, res) => {
-    res.send("Woof Woof");
+    /*     res.send("Woof Woof");
+     */
+    chicken.fly();
 })
 
 app.get('/secret', verifyPassword, (req, res) => {
@@ -34,6 +39,20 @@ app.get('/secret', verifyPassword, (req, res) => {
  */
 app.use((req, res) => {
     res.status(404).send('Not Found');
+})
+
+/*************
+ * Error Handling.
+ *************/
+/* app.use((err, req, res, next) => {
+    console.log("ERROR &***************************");
+    console.log(err);
+    next(err);
+}) */
+app.use((err, req, res, next) => {
+    const { status = 500, message = 'Something went wrong' } = err;
+    res.status(status).send(message);
+
 })
 
 app.listen(3000, () => {
